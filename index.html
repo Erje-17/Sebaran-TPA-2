@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kementrian Lingkungan Hidup – Balai Penegakan Hukum Lingkungan JABALNUSRA</title>
+<meta name="description" content="Profil organisasi dan peta sebaran TPA di Jawa Timur.">
+<script>document.documentElement.className+=' js'</script>
+<link rel="stylesheet" href="css/leaflet.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<!-- PETUNJUK EDIT: ganti semua teks "Nama Organisasi Anda" dan "[...]" dengan isi Anda, simpan, lalu push ke GitHub. -->
+<div id="bar"></div><div id="glow"></div>
+
+<header class="nav" id="nav">
+  <a class="brand" href="#beranda">Balai Penegakan Hukum Lingkungan</a>
+  <nav>
+    <a href="#tentang">Tentang</a><a href="#visi-misi">Visi &amp; Misi</a><a href="#struktur">Struktur</a>
+    <a href="#program">Program</a><a href="#peta">Peta TPA</a><a href="#kontak">Kontak</a>
+  </nav>
+</header>
+
+<main>
+<section class="hero" id="beranda">
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <div class="wrap hero-in">
+    <p class="eyebrow">Sebaran Tempat Pembuangan Akhir (TPA) Jawa Timur</p>
+    <h1 data-depth="14"><span>Menuju Indonesia</span> <span>Bebas Sampah</span></h1>
+    <p class="lead">Memantau kepatuhan usaha atau kegiatan terhadap perizinan dan regulasi lingkungan hidup.</p>
+    <div class="cta"><a class="btn" href="#peta">Lihat Peta Sebaran TPA</a><a class="btn ghost" href="#tentang">Tentang GAKKUM LH</a></div>
+    <div class="hstats" id="hstats"></div>
+  </div>
+  <a class="cue" href="#tentang" aria-label="Gulir ke bawah"><i></i></a>
+</section>
+
+<div class="marquee" aria-hidden="true"><div>
+  <span>Lingkungan</span><span>GAKKUM</span><span>Geospasial</span><span>Pengaduan</span><span>JABALNUSRA</span><span>Data Terbuka</span>
+  <span>Lingkungan</span><span>GAKKUM</span><span>Geospasial</span><span>Pengaduan</span><span>JABALNUSRA</span><span>Data Terbuka</span>
+</div></div>
+
+<section id="tentang">
+  <div class="wrap two">
+    <div class="rv rl"><p class="num">01</p><h2>Tentang Kami</h2></div>
+    <div class="rv rr">
+      <p>Balai Penegakan Hukum Lingkungan Hidup (Balai Gakkum LH) adalah unit pelaksana teknis di bawah Kementerian Lingkungan Hidup / Badan Pengendalian Lingkungan Hidup (KLH/BPLH) yang bertugas melakukan pengawasan, pencegahan, dan penindakan terhadap pelanggaran hukum dan tindak pidana lingkungan hidup.</p>
+      <p>JABALNUSRA</p>
+    </div>
+  </div>
+</section>
+
+<section id="visi-misi" class="alt">
+  <div class="wrap">
+    <p class="num rv">02</p><h2 class="rv">Visi &amp; Misi</h2>
+    <div class="cards">
+      <article class="card tilt rv"><h3>Visi</h3><p>[Tuliskan visi organisasi dalam satu kalimat.]</p></article>
+      <article class="card tilt rv d1"><h3>Misi</h3><ol><li>[Misi pertama]</li><li>[Misi kedua]</li><li>[Misi ketiga]</li></ol></article>
+    </div>
+  </div>
+</section>
+
+<section id="struktur">
+  <div class="wrap">
+    <p class="num rv">03</p><h2 class="rv">Struktur Organisasi</h2>
+    <div class="org">
+      <div class="node top rv"><b>[Nama]</b><span>Ketua / Direktur</span></div>
+      <div class="row">
+        <div class="node rv"><b>[Nama]</b><span>Wakil / Sekretaris</span></div>
+        <div class="node rv d1"><b>[Nama]</b><span>Bidang Data &amp; Pemetaan</span></div>
+        <div class="node rv d2"><b>[Nama]</b><span>Bidang Operasional</span></div>
+        <div class="node rv d3"><b>[Nama]</b><span>Bidang Kemitraan</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="program" class="alt">
+  <div class="wrap">
+    <div class="head-row">
+      <div><p class="num rv">04</p><h2 class="rv">Program &amp; Layanan</h2></div>
+      <div class="arrows"><button id="prev" aria-label="Sebelumnya">←</button><button id="next" aria-label="Berikutnya">→</button></div>
+    </div>
+  </div>
+  <div class="hscroll" id="hs">
+    <article class="card tilt"><b class="idx">01</b><h3>[Program 1]</h3><p>[Deskripsi singkat.]</p></article>
+    <article class="card tilt"><b class="idx">02</b><h3>[Program 2]</h3><p>[Deskripsi singkat.]</p></article>
+    <article class="card tilt"><b class="idx">03</b><h3>[Program 3]</h3><p>[Deskripsi singkat.]</p></article>
+    <article class="card tilt"><b class="idx">04</b><h3>[Program 4]</h3><p>[Deskripsi singkat.]</p></article>
+    <article class="card tilt"><b class="idx">05</b><h3>[Program 5]</h3><p>[Deskripsi singkat.]</p></article>
+  </div>
+  <div class="wrap"><div class="hp"><i id="hpi"></i></div><p class="note">Geser ke samping atau tarik dengan mouse.</p></div>
+</section>
+
+<section id="peta" class="dark">
+  <div class="wrap">
+    <p class="num rv">05</p><h2 class="rv">Peta Sebaran TPA</h2>
+    <p class="sub rv">Klik penanda atau nama TPA pada daftar untuk melihat detail. Gunakan kontrol di kanan atas peta untuk mengganti peta dasar.</p>
+    <div class="stats rv" id="stats"></div>
+    <div class="mapbox rv">
+      <aside id="list" aria-label="Daftar TPA"></aside>
+      <div id="map" role="application" aria-label="Peta sebaran TPA"></div>
+    </div>
+    <p class="note">Sumber batas administrasi: Lapak GIS (2024). Data titik TPA: Database.</p>
+  </div>
+</section>
+
+<section id="kontak" class="alt">
+  <div class="wrap two">
+    <div class="rv rl"><p class="num">06</p><h2>Kontak</h2></div>
+    <div class="rv rr">
+      <p><b>Alamat:</b> [alamat kantor]</p><p><b>Email:</b> [email@contoh.id]</p><p><b>Telepon:</b> [nomor telepon]</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap">© <span id="yr"></span> Nama Organisasi Anda. Seluruh hak cipta dilindungi.</div></footer>
+
+<script src="js/leaflet.js"></script>
+<script src="js/three.min.js"></script>
+<script src="data/kab_jatim.js"></script>
+<script src="data/tpa.js"></script>
+<script src="js/scene.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
