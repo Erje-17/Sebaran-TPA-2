@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Sistem Informasi Geospasial Sebaran Tempat Pemrosesan Akhir (TPA) Provinsi Jawa Timur">
+  <title>SIG Sebaran TPA Provinsi Jawa Timur</title>
+  <link rel="icon" type="image/png" href="images/logo_kantor.png">
+
+  <!-- Library lokal (dapat berjalan offline) -->
+  <link rel="stylesheet" href="css/leaflet.css">
+  <link rel="stylesheet" href="css/MarkerCluster.css">
+  <link rel="stylesheet" href="css/MarkerCluster.Default.css">
+  <link rel="stylesheet" href="css/fontawesome-all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ===================== HEADER ===================== -->
+<header class="app-header" id="appHeader">
+  <div class="brand">
+    <img src="images/logo_kantor.png" alt="Logo instansi" class="brand-logo">
+    <div class="brand-text">
+      <div class="brand-agency">Balai Penegakan Hukum Lingkungan Hidup Jabalnusra</div>
+      <h1 class="brand-title">Sistem Informasi Geospasial Sebaran TPA Provinsi Jawa Timur</h1>
+    </div>
+  </div>
+
+  <nav class="app-nav" id="appNav" aria-label="Navigasi utama">
+    <button class="nav-btn is-active" data-panel="statistik"><i class="fas fa-th-large"></i><span>Statistik</span></button>
+    <button class="nav-btn" data-panel="daftar"><i class="fas fa-list-ul"></i><span>Daftar Lokasi</span></button>
+    <button class="nav-btn" data-panel="grafik"><i class="fas fa-chart-bar"></i><span>Grafik</span></button>
+    <button class="nav-btn" data-panel="tentang"><i class="fas fa-info-circle"></i><span>Tentang</span></button>
+  </nav>
+
+  <div class="header-actions">
+    <button class="icon-btn" id="btnToggleSidebar" title="Tampilkan / sembunyikan panel" aria-label="Tampilkan atau sembunyikan panel">
+      <i class="fas fa-bars"></i>
+    </button>
+  </div>
+</header>
+
+<!-- ===================== MAIN ===================== -->
+<main class="app-main" id="appMain">
+
+  <!-- ---------- SIDEBAR ---------- -->
+  <aside class="sidebar" id="sidebar">
+
+    <!-- Pencarian & filter: selalu tampil -->
+    <section class="filter-box">
+      <div class="search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="search" id="searchInput" placeholder="Cari nama TPA, kabupaten/kota, atau alamat…" autocomplete="off" aria-label="Pencarian lokasi TPA">
+        <button class="clear-btn" id="btnClearSearch" title="Hapus pencarian" aria-label="Hapus pencarian" hidden><i class="fas fa-times"></i></button>
+      </div>
+      <div class="filter-row">
+        <label for="kabFilter" class="sr-only">Filter kabupaten/kota</label>
+        <div class="select-wrap">
+          <i class="fas fa-filter"></i>
+          <select id="kabFilter" aria-label="Filter kabupaten/kota">
+            <option value="">Semua Kabupaten/Kota</option>
+          </select>
+        </div>
+        <button class="btn btn-ghost" id="btnReset" title="Tampilkan kembali seluruh Jawa Timur">
+          <i class="fas fa-undo"></i><span>Reset</span>
+        </button>
+      </div>
+      <div class="filter-status" id="filterStatus" role="status"></div>
+    </section>
+
+    <!-- Panel: STATISTIK -->
+    <section class="panel is-active" id="panel-statistik" data-panel="statistik">
+      <div class="panel-head">
+        <h2><i class="fas fa-th-large"></i> Ringkasan Statistik</h2>
+        <p class="panel-sub">Dihitung otomatis dari data spasial yang dimuat.</p>
+      </div>
+      <div class="stat-grid" id="statGrid">
+        <div class="stat-tile stat-primary">
+          <div class="stat-icon"><i class="fas fa-map-marker-alt"></i></div>
+          <div class="stat-value" id="statTitik">–</div>
+          <div class="stat-label">Titik lokasi TPA</div>
+        </div>
+        <div class="stat-tile stat-teal">
+          <div class="stat-icon"><i class="fas fa-recycle"></i></div>
+          <div class="stat-value" id="statTpaUnik">–</div>
+          <div class="stat-label">TPA unik <small>(nama TPA + kab/kota)</small></div>
+        </div>
+        <div class="stat-tile stat-blue">
+          <div class="stat-icon"><i class="fas fa-building"></i></div>
+          <div class="stat-value" id="statKab">–</div>
+          <div class="stat-label">Kabupaten/Kota ber-TPA</div>
+        </div>
+        <div class="stat-tile stat-orange">
+          <div class="stat-icon"><i class="fas fa-address-card"></i></div>
+          <div class="stat-value" id="statAlamat">–</div>
+          <div class="stat-label">Titik dengan informasi alamat</div>
+        </div>
+        <div class="stat-tile stat-gray">
+          <div class="stat-icon"><i class="fas fa-crosshairs"></i></div>
+          <div class="stat-value" id="statKoord">–</div>
+          <div class="stat-label">Titik dengan koordinat</div>
+        </div>
+      </div>
+      <div class="note-box" id="statNote">
+        <i class="fas fa-info-circle"></i>
+        <div>
+          <strong>Mengapa jumlah titik ≠ jumlah TPA?</strong>
+          <p id="statNoteText">Satu TPA dapat terdiri dari beberapa titik/zona pengamatan. Setiap titik ditampilkan sebagai marker terpisah dengan nama TPA yang sama.</p>
+        </div>
+      </div>
+
+      <div class="panel-head mt">
+        <h3><i class="fas fa-table"></i> Ringkasan per Kabupaten/Kota</h3>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table compact" id="summaryTable">
+          <thead><tr><th>Kabupaten/Kota</th><th class="num">TPA</th><th class="num">Titik</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Panel: DAFTAR LOKASI -->
+    <section class="panel" id="panel-daftar" data-panel="daftar">
+      <div class="panel-head">
+        <h2><i class="fas fa-list-ul"></i> Daftar Lokasi TPA</h2>
+        <p class="panel-sub">Klik salah satu lokasi untuk menampilkannya di peta.</p>
+      </div>
+      <div class="list-toolbar">
+        <div class="select-wrap small">
+          <i class="fas fa-sort"></i>
+          <select id="sortSelect" aria-label="Urutkan daftar">
+            <option value="kab-asc">Kab/Kota (A–Z)</option>
+            <option value="kab-desc">Kab/Kota (Z–A)</option>
+            <option value="tpa-asc">Nama TPA (A–Z)</option>
+            <option value="tpa-desc">Nama TPA (Z–A)</option>
+          </select>
+        </div>
+        <div class="view-toggle" role="group" aria-label="Mode tampilan">
+          <button class="icon-btn small is-active" id="viewCards" title="Tampilan kartu"><i class="fas fa-th-large"></i></button>
+          <button class="icon-btn small" id="viewTable" title="Tampilan tabel"><i class="fas fa-table"></i></button>
+        </div>
+      </div>
+      <div class="list-count" id="listCount"></div>
+      <div id="listContainer" class="list-cards"></div>
+      <div class="pagination" id="pagination"></div>
+    </section>
+
+    <!-- Panel: GRAFIK -->
+    <section class="panel" id="panel-grafik" data-panel="grafik">
+      <div class="panel-head">
+        <h2><i class="fas fa-chart-bar"></i> Visualisasi Statistik</h2>
+        <p class="panel-sub">Grafik mengikuti hasil pencarian dan filter yang aktif.</p>
+      </div>
+      <div class="chart-card">
+        <h3>Jumlah titik lokasi TPA per kabupaten/kota</h3>
+        <div class="chart" id="chartBar"></div>
+      </div>
+      <div class="chart-card">
+        <h3>Jumlah TPA unik per kabupaten/kota</h3>
+        <div class="chart" id="chartBarTpa"></div>
+      </div>
+      <div class="chart-card">
+        <h3>Distribusi titik berdasarkan jenis wilayah</h3>
+        <div class="chart" id="chartDonut"></div>
+      </div>
+    </section>
+
+    <!-- Panel: TENTANG -->
+    <section class="panel" id="panel-tentang" data-panel="tentang">
+      <div class="panel-head">
+        <h2><i class="fas fa-info-circle"></i> Tentang Aplikasi</h2>
+      </div>
+      <div class="about">
+        <div class="about-logo">
+          <img src="images/logo_kantor.png" alt="Logo instansi">
+          <div>
+            <strong>Balai Penegakan Hukum Lingkungan Hidup Jabalnusra</strong>
+          </div>
+        </div>
+        <dl class="about-list">
+          <dt><i class="fas fa-bullseye"></i> Tujuan</dt>
+          <dd>Menyajikan informasi persebaran Tempat Pemrosesan Akhir (TPA) sampah secara spasial dan informatif sebagai bahan pendukung pemantauan, pengawasan, dan pengambilan kebijakan pengelolaan sampah.</dd>
+          <dt><i class="fas fa-globe"></i> Cakupan wilayah</dt>
+          <dd>Provinsi Jawa Timur.</dd>
+          <dt><i class="fas fa-database"></i> Jenis data</dt>
+          <dd>Titik lokasi dan persebaran TPA (nama TPA, kabupaten/kota, alamat, koordinat, foto) serta batas administrasi kabupaten/kota sebagai layer pendukung.</dd>
+          <dt><i class="fas fa-map"></i> Sumber data</dt>
+          <dd>Data hasil pengolahan QGIS (ekspor QGIS2Web) yang disediakan oleh instansi: layer <code>LokasiTPA_2</code> dan <code>GarisAdministrasiKabKota_1</code>. Batas administrasi mengacu pada metadata <span id="aboutAdmMeta">–</span>.</dd>
+          <dt><i class="fas fa-calendar-alt"></i> Pembaruan data</dt>
+          <dd>Tanggal ekspor data sumber: <span id="aboutExportDate">2 November 2026</span> (berdasarkan nama berkas ekspor QGIS2Web). Informasi pembaruan atribut TPA tidak tersedia dalam data sumber.</dd>
+          <dt><i class="fas fa-exclamation-triangle"></i> Catatan kualitas data</dt>
+          <dd id="aboutCatatan">Beberapa titik memiliki catatan interpretasi koordinat dari data sumber. Catatan tersebut ditampilkan pada panel detail lokasi yang bersangkutan.</dd>
+          <dt><i class="fas fa-link"></i> Basemap</dt>
+          <dd>OpenStreetMap dan Esri World Imagery dimuat dari layanan daring, sehingga memerlukan koneksi internet. Data TPA, batas administrasi, dan seluruh library berjalan secara lokal.</dd>
+        </dl>
+        <div class="about-tech">
+          <span>HTML5</span><span>CSS3</span><span>JavaScript</span><span>Leaflet 1.9</span><span>Leaflet.markercluster</span><span>GeoJSON</span><span>SVG Charts</span>
+        </div>
+      </div>
+    </section>
+  </aside>
+
+  <!-- ---------- MAP ---------- -->
+  <section class="map-area" id="mapArea">
+    <div id="map" role="application" aria-label="Peta sebaran TPA Jawa Timur"></div>
+
+    <!-- Panel detail lokasi -->
+    <div class="detail-panel" id="detailPanel" aria-live="polite" hidden>
+      <button class="detail-close" id="btnDetailClose" title="Tutup" aria-label="Tutup panel detail"><i class="fas fa-times"></i></button>
+      <div class="detail-photo" id="detailPhoto"></div>
+      <div class="detail-body">
+        <div class="detail-kicker" id="detailKab"></div>
+        <h3 class="detail-title" id="detailTpa"></h3>
+        <div class="detail-badge" id="detailTitik"></div>
+        <dl class="detail-list">
+          <dt><i class="fas fa-map-marker-alt"></i> Alamat</dt>
+          <dd id="detailAlamat"></dd>
+          <dt><i class="fas fa-crosshairs"></i> Latitude</dt>
+          <dd id="detailLat" class="mono"></dd>
+          <dt><i class="fas fa-crosshairs"></i> Longitude</dt>
+          <dd id="detailLon" class="mono"></dd>
+          <dt><i class="fas fa-compass"></i> Koordinat sumber</dt>
+          <dd id="detailKoordAsli" class="mono small"></dd>
+        </dl>
+        <div class="detail-note" id="detailCatatan" hidden></div>
+        <div class="detail-actions">
+          <button class="btn btn-primary" id="btnZoomTo"><i class="fas fa-search-plus"></i> Zoom ke lokasi</button>
+          <button class="btn btn-ghost" id="btnCopyCoord"><i class="fas fa-copy"></i> Salin koordinat</button>
+          <a class="btn btn-ghost" id="btnGmaps" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i> Google Maps</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legenda -->
+    <div class="legend-box" id="legendBox">
+      <div class="legend-head">
+        <strong><i class="fas fa-map-signs"></i> Legenda</strong>
+        <button class="icon-btn tiny" id="btnLegendToggle" title="Ciutkan legenda" aria-label="Ciutkan legenda"><i class="fas fa-chevron-down"></i></button>
+      </div>
+      <div class="legend-body">
+        <div class="legend-item"><span class="legend-marker"><i class="fas fa-recycle"></i></span> Titik lokasi TPA</div>
+        <div class="legend-item"><span class="legend-marker is-active"><i class="fas fa-recycle"></i></span> Lokasi TPA terpilih</div>
+        <div class="legend-item"><span class="legend-cluster">5</span> Kelompok titik (klik untuk memperbesar)</div>
+        <div class="legend-item"><span class="legend-poly has-tpa"></span> Kab/Kota dengan data TPA</div>
+        <div class="legend-item"><span class="legend-poly"></span> Batas kabupaten/kota lainnya</div>
+        <div class="legend-item"><span class="legend-poly selected"></span> Kab/Kota terfilter</div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </section>
+</main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="app-footer">
+  <img src="images/logo_kantor.png" alt="" class="footer-logo">
+  <span>Balai Penegakan Hukum Lingkungan Hidup Jabalnusra &middot; Sistem Informasi Geospasial Sebaran TPA Provinsi Jawa Timur</span>
+  <span class="footer-right">Sumber data: hasil pengolahan QGIS (QGIS2Web) &middot; <span id="footerCount"></span></span>
+</footer>
+
+<!-- Data -->
+<script src="data/GarisAdministrasiKabKota_1.js"></script>
+<script src="data/LokasiTPA_2.js"></script>
+<!-- Library -->
+<script src="libraries/leaflet.js"></script>
+<script src="libraries/leaflet.markercluster.js"></script>
+<!-- Aplikasi -->
+<script src="js/charts.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
